@@ -1,3 +1,13 @@
+// Variable global badala ya const ili kuzuia 'already declared' error
+var supabaseClient = null;
+
+// Initialize Supabase Client salama
+if (typeof supabase !== 'undefined' && supabase.createClient) {
+  const SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
+  const SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
 let currentClass = '';
 let currentRows = [];
 let currentTeacher = '';
@@ -18,15 +28,7 @@ const pages = [
 const ADMIN_PASSWORD = 'admin123';
 const TEACHER_PASSWORD = 'teacher123';
 
-// Supabase Configuration
-const SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
-
-const supabase = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) 
-  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
-  : null;
-
-// Page Navigation
+// Navigation Function
 function showPage(id) {
   pages.forEach(p => {
     const el = document.getElementById(p);
@@ -37,25 +39,28 @@ function showPage(id) {
   if (id === 'admin') renderAdmin();
 }
 
-// Dark / Light Theme Toggle
-const themeBtn = document.getElementById('themeBtn');
-if (themeBtn) {
-  themeBtn.onclick = () => document.body.classList.toggle('dark');
+// Helpers
+function sanitizeText(value) {
+  return String(value || '').trim().replace(/[<>]/g, '');
 }
 
-// Logout
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.onclick = () => {
-    logoutBtn.classList.add('hidden');
-    showPage('landing');
-  };
+function normalizeSubject(value) {
+  return sanitizeText(value).replace(/\s+/g, ' ');
 }
 
-// Teacher Account Creation
+function grade(m) {
+  m = Number(m);
+  if (m >= 80) return 'A';
+  if (m >= 70) return 'B+';
+  if (m >= 60) return 'B';
+  if (m >= 50) return 'C';
+  if (m >= 40) return 'D';
+  return 'F';
+}
+
+// Actions
 function createTeacherAccount() {
   let name = sanitizeText(document.getElementById('teacherCreateName')?.value);
-  let email = sanitizeText(document.getElementById('teacherCreateEmail')?.value);
   let pass = sanitizeText(document.getElementById('teacherCreatePassword')?.value);
 
   if (!name || !pass) {
@@ -69,7 +74,6 @@ function createTeacherAccount() {
   showPage('teacherProfile');
 }
 
-// Teacher Authentication
 function teacherEnter() {
   let nameInput = document.getElementById('teacherLoginName');
   let passInput = document.getElementById('teacherLoginPassword');
@@ -77,20 +81,16 @@ function teacherEnter() {
   let teacherName = sanitizeText(nameInput ? nameInput.value : '');
   let teacherPassword = sanitizeText(passInput ? passInput.value : '');
   
-  if (!teacherName) { alert('Jina la mwalimu linahitajika.'); return; }
-  if (!teacherPassword) { alert('Weka password ya mwalimu.'); return; }
-  if (teacherPassword !== TEACHER_PASSWORD) { alert('Password ya mwalimu si sahihi.'); return; }
+  if (!teacherName || !teacherPassword) { alert('Jaza jina na password.'); return; }
+  if (teacherPassword !== TEACHER_PASSWORD) { alert('Password si sahihi.'); return; }
   
   currentTeacher = teacherName;
-  if (logoutBtn) logoutBtn.classList.remove('hidden');
-  
   let profName = document.getElementById('profileName');
   if (profName) profName.value = currentTeacher;
   
   showPage('teacherProfile');
 }
 
-// Admin Authentication
 function adminEnter() {
   let nameInput = document.getElementById('adminName');
   let passInput = document.getElementById('adminPassword');
@@ -98,16 +98,13 @@ function adminEnter() {
   let adminName = sanitizeText(nameInput ? nameInput.value : '');
   let adminPassword = sanitizeText(passInput ? passInput.value : '');
   
-  if (!adminName) { alert('Jina la admin linahitajika.'); return; }
-  if (!adminPassword) { alert('Weka password ya admin.'); return; }
-  if (adminPassword !== ADMIN_PASSWORD) { alert('Password ya admin si sahihi.'); return; }
+  if (!adminName || !adminPassword) { alert('Jaza jina na password.'); return; }
+  if (adminPassword !== ADMIN_PASSWORD) { alert('Password si sahihi.'); return; }
   
   currentAdminName = adminName;
-  if (logoutBtn) logoutBtn.classList.remove('hidden');
   showPage('adminProfile');
 }
 
-// Image Preview
 function preview(input, id) {
   if (input.files && input.files[0]) {
     let r = new FileReader();
@@ -119,7 +116,6 @@ function preview(input, id) {
   }
 }
 
-// Save Teacher Profile to Supabase
 async function confirmTeacherProfile() {
   let n = sanitizeText(document.getElementById('profileName')?.value);
   let role = sanitizeText(document.getElementById('profileRole')?.value);
@@ -129,19 +125,18 @@ async function confirmTeacherProfile() {
   currentTeacherRole = role || 'Mwalimu';
   currentTeacherBio = bio || '';
 
-  if (supabase) {
-    const { error } = await supabase.from('teachers').insert([{
+  if (supabaseClient) {
+    const { error } = await supabaseClient.from('teachers').insert([{
       name: currentTeacher,
       role: currentTeacherRole,
       bio: currentTeacherBio
     }]);
-    if (error) console.error('Error saving teacher profile:', error.message);
+    if (error) console.error('Error teacher:', error.message);
   }
 
   showPage('classes');
 }
 
-// Save Admin Profile to Supabase
 async function saveAdminProfile() {
   let name = sanitizeText(document.getElementById('adminProfileName')?.value);
   let role = sanitizeText(document.getElementById('adminRole')?.value);
@@ -151,13 +146,13 @@ async function saveAdminProfile() {
   currentAdminRole = role || 'Msimamizi Mkuu';
   currentAdminBio = bio || '';
 
-  if (supabase) {
-    const { error } = await supabase.from('admins').insert([{
+  if (supabaseClient) {
+    const { error } = await supabaseClient.from('admins').insert([{
       name: currentAdminName || 'Admin',
       role: currentAdminRole,
       bio: currentAdminBio
     }]);
-    if (error) console.error('Error saving admin profile:', error.message);
+    if (error) console.error('Error admin:', error.message);
   }
 
   showPage('admin');
@@ -170,21 +165,13 @@ function selectClass(c) {
   showPage('classInfo');
 }
 
-function sanitizeText(value) {
-  return String(value || '').trim().replace(/[<>]/g, '');
-}
-
-function normalizeSubject(value) {
-  return sanitizeText(value).replace(/\s+/g, ' ');
-} 
-
 function goToResults() {
   let s = normalizeSubject(document.getElementById('subject')?.value);
   let t = sanitizeText(document.getElementById('term')?.value);
   let y = sanitizeText(document.getElementById('year')?.value);
   let stream = sanitizeText(document.getElementById('stream')?.value).toUpperCase() || 'A';
   
-  if (!s || !t || !y) { alert('Jaza Somo, Term na Mwaka kabla ya kuendelea.'); return; }
+  if (!s || !t || !y) { alert('Jaza Somo, Term na Mwaka.'); return; }
   
   let infoSummary = document.getElementById('infoSummary');
   let resultClass = document.getElementById('resultClass');
@@ -199,16 +186,6 @@ function goToResults() {
   }
   renderRows();
   showPage('results');
-}
-
-function grade(m) {
-  m = Number(m);
-  if (m >= 80) return 'A';
-  if (m >= 70) return 'B+';
-  if (m >= 60) return 'B';
-  if (m >= 50) return 'C';
-  if (m >= 40) return 'D';
-  return 'F';
 }
 
 function renderRows() {
@@ -260,7 +237,6 @@ function reviewSubmission() {
   showPage('review');
 }
 
-// Submit Results to Supabase
 async function submitResults() {
   let item = {
     class_name: currentClass,
@@ -281,12 +257,9 @@ async function submitResults() {
     }))
   };
 
-  if (supabase) {
-    const { data, error } = await supabase.from('results').insert([item]).select();
-    if (error) {
-      alert('Hitilafu ya kuhifadhi Supabase: ' + error.message);
-      return;
-    }
+  if (supabaseClient) {
+    const { data, error } = await supabaseClient.from('results').insert([item]).select();
+    if (error) console.error('Supabase Error:', error.message);
     if (data && data.length) item.id = data[0].id;
   } else {
     item.id = Date.now();
@@ -294,7 +267,7 @@ async function submitResults() {
 
   submissions.unshift(item);
   history.unshift(item);
-  alert('Matokeo yamefanikiwa kutumwa kwa Admin!');
+  alert('Matokeo yamefanikiwa kutumwa!');
   currentRows = [];
   showPage('postSubmit');
 }
@@ -311,7 +284,7 @@ function renderHistory() {
       </div>
       <span class="status">${x.status}</span>
     </div>
-  `).join('') : '<div class="card">Hakuna historia ya matokeo kwa sasa.</div>';
+  `).join('') : '<div class="card">Hakuna historia ya matokeo.</div>';
 }
 
 function renderAdmin() {
@@ -330,37 +303,15 @@ function renderAdmin() {
         <div>
           <span class="status">${x.status}</span>
           <button class="primary" style="margin-left:8px" onclick="approve('${x.id}')">Approve</button>
-          <button class="secondary" style="margin-left:8px" onclick="viewSubmission('${x.id}')">View</button>
         </div>
       </div>
     `).join('') : '<div class="card">Hakuna matokeo yaliyotumwa bado.</div>';
   }
 }
 
-function viewSubmission(id) {
-  let item = submissions.find(x => x.id == id);
-  if (!item) return;
-
-  let rowDetail = (item.rows || []).map(r => `${r.name} (${r.adm || 'No Adm'}) : <b>${r.marks}</b> (${r.grade})`).join('<br>');
-
-  let detailContent = document.getElementById('adminDetailContent');
-  let detailCard = document.getElementById('adminDetail');
-
-  if (detailContent) {
-    detailContent.innerHTML = `
-      <div class="review-row"><b>Mwalimu:</b> <span>${item.teacher_name || item.teacher} (${item.teacher_role || '—'})</span></div>
-      <div class="review-row"><b>Bio / CV ya Mwalimu:</b> <span>${item.teacher_bio || '—'}</span></div>
-      <div class="review-row"><b>Darasa & Somo:</b> <span>${item.class_name || item.class} — ${item.subject} (${item.term} ${item.year})</span></div>
-      <hr>
-      <div class="review-row"><b>Matokeo ya Wanafunzi:</b><br><span>${rowDetail}</span></div>
-    `;
-  }
-  if (detailCard) detailCard.classList.remove('hidden');
-}
-
 async function approve(id) {
-  if (supabase) {
-    await supabase.from('results').update({ status: 'Approved' }).eq('id', id);
+  if (supabaseClient) {
+    await supabaseClient.from('results').update({ status: 'Approved' }).eq('id', id);
   }
   submissions = submissions.map(x => x.id == id ? { ...x, status: 'Approved' } : x);
   history = history.map(x => x.id == id ? { ...x, status: 'Approved' } : x);
@@ -369,10 +320,9 @@ async function approve(id) {
 }
 
 async function loadFromSupabase() {
-  if (!supabase) return;
-  const { data, error } = await supabase.from('results').select('*').order('id', { ascending: false });
-  if (error) { console.error(error); return; }
-  if (data) {
+  if (!supabaseClient) return;
+  const { data, error } = await supabaseClient.from('results').select('*').order('id', { ascending: false });
+  if (!error && data) {
     submissions = data;
     history = data;
   }
@@ -383,4 +333,5 @@ async function init() {
   showPage('landing');
 }
 
+// Anzisha mfumo
 init();
