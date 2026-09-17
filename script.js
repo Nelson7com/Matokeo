@@ -20,7 +20,7 @@ const TEACHER_PASSWORD = 'teacher123';
 
 // Supabase Configuration - Weka Keys Zako Hapa
 const SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_PUBLISHABLE_OR_ANON_KEY_HERE';
+const SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
 
 const supabase = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'https://your-project-ref.supabase.co') 
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
