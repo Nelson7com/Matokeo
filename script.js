@@ -18,11 +18,11 @@ const pages = [
 const ADMIN_PASSWORD = 'admin123';
 const TEACHER_PASSWORD = 'teacher123';
 
-// Supabase Configuration - Weka Keys Zako Hapa
+// Supabase Configuration
 const SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
 
-const supabase = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'https://your-project-ref.supabase.co') 
+const supabase = (window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY) 
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
   : null;
 
@@ -52,10 +52,27 @@ if (logoutBtn) {
   };
 }
 
+// Teacher Account Creation
+function createTeacherAccount() {
+  let name = sanitizeText(document.getElementById('teacherCreateName')?.value);
+  let email = sanitizeText(document.getElementById('teacherCreateEmail')?.value);
+  let pass = sanitizeText(document.getElementById('teacherCreatePassword')?.value);
+
+  if (!name || !pass) {
+    alert('Tafadhali jaza Jina na Password!');
+    return;
+  }
+  currentTeacher = name;
+  let profName = document.getElementById('profileName');
+  if (profName) profName.value = currentTeacher;
+  alert('Akaunti imeundwa kikamilifu!');
+  showPage('teacherProfile');
+}
+
 // Teacher Authentication
 function teacherEnter() {
-  let nameInput = document.getElementById('teacherName');
-  let passInput = document.getElementById('teacherPassword');
+  let nameInput = document.getElementById('teacherLoginName');
+  let passInput = document.getElementById('teacherLoginPassword');
   
   let teacherName = sanitizeText(nameInput ? nameInput.value : '');
   let teacherPassword = sanitizeText(passInput ? passInput.value : '');
@@ -67,7 +84,6 @@ function teacherEnter() {
   currentTeacher = teacherName;
   if (logoutBtn) logoutBtn.classList.remove('hidden');
   
-  // Jaza jina kwenye profile
   let profName = document.getElementById('profileName');
   if (profName) profName.value = currentTeacher;
   
@@ -91,7 +107,7 @@ function adminEnter() {
   showPage('adminProfile');
 }
 
-// Image Preview for Profile Photos
+// Image Preview
 function preview(input, id) {
   if (input.files && input.files[0]) {
     let r = new FileReader();
@@ -127,9 +143,11 @@ async function confirmTeacherProfile() {
 
 // Save Admin Profile to Supabase
 async function saveAdminProfile() {
+  let name = sanitizeText(document.getElementById('adminProfileName')?.value);
   let role = sanitizeText(document.getElementById('adminRole')?.value);
   let bio = sanitizeText(document.getElementById('adminBio')?.value);
   
+  if (name) currentAdminName = name;
   currentAdminRole = role || 'Msimamizi Mkuu';
   currentAdminBio = bio || '';
 
