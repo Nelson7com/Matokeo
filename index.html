@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kasange Secondary School - Results System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand"><div class="logo">KSS</div><div><b>Kasange Secondary School</b><small>Student Results Management System</small></div></div>
+    <div class="actions"><button id="themeBtn" class="icon-btn">☾</button><button id="logoutBtn" class="danger hidden">Logout</button></div>
+  </header>
+
+  <main>
+    <section id="landing" class="page">
+      <div class="hero">
+        <div class="hero-copy">
+          <span class="pill">KASANGE SECONDARY SCHOOL</span>
+          <h1>Student Results<br><span>Management System</span></h1>
+          <p>Mfumo wa walimu kuingiza, kuhakiki na kuwasilisha matokeo kwa uongozi wa shule kwa usalama na urahisi.</p>
+          <div class="hero-buttons"><button class="primary" onclick="showPage('teacherLogin')">Teacher Portal</button><button class="secondary admin-portal-button" onclick="showPage('adminLogin')">Admin Portal</button></div>
+        </div>
+        <div class="hero-image">
+          <div class="hero-photo-layer">
+            <img class="hero-photo" src="image/form four1.jpg" alt="Kasange Secondary School">
+          </div>
+          <div class="hero-logo-wrap">
+            <div class="hero-logo-text">KASANGE<br>SECONDARY</div>
+            <div class="image-placeholder-small">RESULTS SYSTEM</div>
+          </div>
+        </div>
+      </div>
+      <div class="stats"><div><b>Form I–VI</b><small>Madarasa yote</small></div><div><b>20,000+</b><small>Wanafunzi</small></div><div><b>Secure</b><small>Teacher & Admin workflow</small></div></div>
+    </section>
+
+    <section id="teacherLogin" class="page hidden"><div class="card auth"><h2>Teacher Login</h2><p>Unda akaunti ya mwalimu kwa jina, email, password na picha. Baada ya hapo ingia kwa jina lako na password.</p><div class="card" style="padding:16px; margin-bottom:14px;"><h3 style="margin-top:0;">Unda Akaunti</h3><input id="teacherCreateName" placeholder="Jina kamili"><input id="teacherCreateEmail" placeholder="Email"><input id="teacherCreatePassword" type="password" placeholder="Password"><div class="photo-upload"><div id="teacherSignupPreview" class="avatar"><img src="image/profile.jpeg" alt="Teacher profile"></div><input id="teacherCreatePhoto" type="file" accept="image/*" onchange="preview(this,'teacherSignupPreview')"></div><button class="primary full" onclick="createTeacherAccount()">Unda Akaunti</button></div><div class="card" style="padding:16px;"><h3 style="margin-top:0;">Login</h3><input id="teacherLoginName" placeholder="Jina la mwalimu"><input id="teacherLoginPassword" type="password" placeholder="Password"><button class="secondary full" onclick="teacherEnter()">Login</button></div><button class="link" onclick="showPage('landing')">← Rudi</button></div></section>
+
+    <section id="adminLogin" class="page hidden"><div class="card auth"><h2>Admin Login</h2><p>Academic / Mkuu wa Shule</p><input id="adminName" placeholder="Jina la admin"><input id="adminPassword" type="password" placeholder="Password"><button class="primary full" onclick="adminEnter()">Login</button><button class="link" onclick="showPage('landing')">← Rudi</button></div></section>
+
+    <section id="classes" class="page hidden">
+      <div class="section-head"><div><span class="pill">TEACHER PORTAL</span><h2>Chagua Darasa</h2><p>Chagua Form utakayojaza matokeo.</p></div><button class="secondary" onclick="showPage('teacherProfile')">Teacher Profile</button></div>
+      <div class="class-grid">
+        <div class="class-card" onclick="selectClass('Form One')"><div class="class-image"><img src="image/FORM ONE.jpg" alt="Form One"></div><h3>Form One</h3><p>Kidato cha Kwanza</p></div>
+        <div class="class-card" onclick="selectClass('Form Two')"><div class="class-image"><img src="image/FORM TWO.jpg" alt="Form Two"></div><h3>Form Two</h3><p>Kidato cha Pili</p></div>
+        <div class="class-card" onclick="selectClass('Form Three')"><div class="class-image"><img src="image/FORM THREE.jpg" alt="Form Three"></div><h3>Form Three</h3><p>Kidato cha Tatu</p></div>
+        <div class="class-card" onclick="selectClass('Form Four')"><div class="class-image"><img src="image/FORM FOUR.jpg" alt="Form Four"></div><h3>Form Four</h3><p>Kidato cha Nne</p></div>
+        <div class="class-card" onclick="selectClass('Form Five')"><div class="class-image"><img src="image/FORM five.jpg" alt="Form Five"></div><h3>Form Five</h3><p>Kidato cha Tano</p></div>
+        <div class="class-card" onclick="selectClass('Form Six')"><div class="class-image"><img src="image/FORM sixc.jpg" alt="Form Six"></div><h3>Form Six</h3><p>Kidato cha Sita</p></div>
+      </div>
+    </section>
+
+    <section id="teacherProfile" class="page hidden"><div class="card form-card"><h2>Teacher Profile</h2><p>Jaza taarifa zako za msingi. Jina, namba ya simu, password na picha ni muhimu; taarifa za NIDA na somo ni chaguo.</p><div class="photo-upload"><div id="teacherPreview" class="avatar"><img src="image/profile.jpeg" alt="Teacher profile"></div><input id="teacherPhoto" type="file" accept="image/*" onchange="preview(this,'teacherPreview')"></div><input id="profileName" placeholder="Jina kamili" required><input id="profilePhone" placeholder="Namba ya simu" required><input id="profileEmail" placeholder="Email" required><input id="profilePassword" type="password" placeholder="Password mpya" required><input id="profilePasswordConfirm" type="password" placeholder="Thibitisha password"><textarea id="profileBio" placeholder="Maelezo mafupi"></textarea><button class="primary full" onclick="confirmTeacherProfile()">Endelea</button><button class="secondary full" onclick="showPage('teacherLogin')">Ghairi / Rudi</button></div></section>
+
+    <section id="classInfo" class="page hidden"><div class="card form-card"><span class="pill" id="chosenClass"></span><h2>Taarifa za Uingizaji</h2><input id="subject" placeholder="Somo (mf. Mathematics)"><input id="term" placeholder="Term (mf. Term 1)"><input id="year" placeholder="Mwaka (mf. 2026)"><input id="stream" placeholder="Mkondo (mf. A, B, C)"><div class="confirm-box"><b>Hakiki taarifa zako</b><p id="infoSummary"></p></div><button class="primary full" onclick="goToResults()">Hakiki & Endelea</button><button class="secondary full" onclick="showPage('classes')">Ghairi / Rudi</button></div></section>
+
+    <section id="results" class="page hidden"><div class="section-head"><div><span class="pill" id="resultClass"></span><h2>Ingiza Matokeo</h2><p id="resultMeta"></p></div><button class="secondary" onclick="addStudent()">+ Ongeza Mwanafunzi</button></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Jina la Mwanafunzi</th><th>Admission No. <span class="optional-tag">optional</span></th><th>Marks</th><th>Grade</th><th>Action</th></tr></thead><tbody id="resultBody"></tbody></table></div><div class="bottom-actions"><button class="secondary" onclick="showPage('classes')">← Rudi</button><button class="secondary" onclick="showPage('history')">History</button><button class="primary" onclick="reviewSubmission()">Submit to Admin</button></div></section>
+
+    <section id="review" class="page hidden"><div class="card form-card"><h2>Hakiki kabla ya Submit</h2><div id="reviewContent" class="review"></div><div class="confirm-box"><b>Je, taarifa zote ni sahihi?</b><p>Ukithibitisha, matokeo yatawekwa kwenye submissions za Admin.</p></div><button class="primary full" onclick="submitResults()">Thibitisha & Submit</button><button class="secondary full" onclick="showPage('results')">Ghairi / Rudi kuhariri</button></div></section>
+
+    <section id="postSubmit" class="page hidden"><div class="card form-card"><span class="pill">RESULTS SENT</span><h2>Matokeo yamepokelewa</h2><p>Umejaza na kutuma matokeo kwa Admin. Unaweza kuendelea kujaza, angalia historia, au kurudi kwenye class.</p><div class="post-submit-actions"><button class="primary full" onclick="showPage('results')">Endelea Kujaza</button><button class="secondary full" onclick="showPage('history')">Angalia History</button><button class="link full" onclick="showPage('classes')">← Rudi kwenye Darasa</button></div></div></section>
+
+    <section id="history" class="page hidden"><div class="section-head"><div><span class="pill">HISTORY</span><h2>Historia ya Matokeo</h2></div><button class="secondary" onclick="showPage('classes')">← Madarasa</button></div><div id="historyList" class="history-list"></div></section>
+
+    <section id="admin" class="page hidden"><div class="section-head"><div><span class="pill">ADMIN DASHBOARD</span><h2>Admin Dashboard</h2><p>Manage submissions, teachers and school results.</p></div><button class="secondary" onclick="showPage('adminProfile')">Admin Profile</button></div><div class="admin-grid"><div class="metric"><b id="pendingCount">0</b><small>Pending Submissions</small></div><div class="metric"><b>Form I–VI</b><small>Classes</small></div><div class="metric"><b>20K+</b><small>Capacity</small></div></div><h3>Submitted Results</h3><div id="adminList" class="history-list"></div><div id="adminDetail" class="card admin-detail hidden"><div id="adminDetailContent" class="review"></div></div></section>
+    <section id="adminProfile" class="page hidden">
+        <div class="card form-card">
+            <h2>Admin Profile</h2>
+
+            <div class="photo-upload">
+                <div id="adminPreview" class="avatar">
+                    <img src="image/profile.jpeg" alt="Admin profile">
+                </div>
+
+                <input
+                    id="adminPhoto"
+                    type="file"
+                    accept="image/*"
+                    onchange="preview(this,'adminPreview')"
+                >
+            </div>
+
+            <input
+                id="adminName"
+                placeholder="Jina la Admin"
+            >
+
+            <input
+                id="adminRole"
+                placeholder="Role / Nafasi"
+            >
+
+            <textarea
+                id="adminBio"
+                placeholder="Maelezo mafupi"
+            ></textarea>
+
+            <button
+                class="primary full"
+                onclick="saveAdminProfile()"
+            >
+                Save Profile & Open Dashboard
+            </button>
+
+            <button
+                class="secondary full"
+                onclick="showPage('landing')"
+            >
+                Ghairi / Rudi
+            </button>
+        </div>
+    </section>
+  </main>
+  <footer class="app-footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <img class="footer-profile" src="image/profile.jpeg" alt="Kasange profile">
+        <span class="footer-title">Nelson Johnson Ntiruhungwa</span>
+      </div>
+      <div class="footer-links">
+        <span>Results System</span>
+        <span>Teacher Portal</span>
+        <span>Admin Portal</span>
+      </div>
+      <div class="footer-meta">
+        <span>© 2026</span>
+      </div>
+    </div>
+  </footer>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="script.js"></script>
+</body>
+</html>
