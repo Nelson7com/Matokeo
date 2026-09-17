@@ -1,13 +1,12 @@
 // Variable global badala ya const ili kuzuia 'already declared' error
+// Tumia jina jipya (supabaseClient) kuzuia mgongano wa majina
 var supabaseClient = null;
 
-// Initialize Supabase Client salama
 if (typeof supabase !== 'undefined' && supabase.createClient) {
   const SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
   const SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
   supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
-
 let currentClass = '';
 let currentRows = [];
 let currentTeacher = '';
