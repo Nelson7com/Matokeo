@@ -1,8 +1,11 @@
 // Supabase Configuration
-// Badilisha hapa uweke URL na Anon Key zako halisi za Supabase
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_KEY = "YOUR_SUPABASE_ANON_KEY";
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+var SUPABASE_URL = 'https://nnytkdjooerftqowcxvu.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_OtNLdiJlOW40cDdLvLO3QA_CKBVmcws';
+
+// Tumia supabaseClient ili kuepuka migongano ya majina (SyntaxError)
+const supabaseClient = (window.supabase && typeof window.supabase.createClient === 'function') 
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) 
+  : null;
 
 // App State
 let currentUser = null;
@@ -134,7 +137,6 @@ function goToResults() {
   document.getElementById('resultClass').textContent = selectedClass;
   document.getElementById('resultMeta').textContent = `${currentSubject} | ${currentTerm} (${currentYear}) | Mkondo: ${currentStream || 'A'}`;
 
-  // Kama hakuna wanafunzi, ongeza mstari mmoja wa kwanza
   if (studentsData.length === 0) {
     studentsData = [{ fullname: '', adm: '', marks: '' }];
   }
@@ -229,9 +231,9 @@ async function submitResults() {
     rows: validStudents
   };
 
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data, error } = await supabase.from('results').insert([payload]);
+      const { data, error } = await supabaseClient.from('results').insert([payload]);
       if (error) console.error('Supabase Error:', error);
     } catch (e) {
       console.error(e);
@@ -245,9 +247,9 @@ async function submitResults() {
 
 // Load Submissions
 async function loadSubmissions() {
-  if (supabase) {
+  if (supabaseClient) {
     try {
-      const { data, error } = await supabase.from('results').select('*').order('id', { ascending: false });
+      const { data, error } = await supabaseClient.from('results').select('*').order('id', { ascending: false });
       if (!error && data) {
         submissions = data;
       }
@@ -257,7 +259,7 @@ async function loadSubmissions() {
   }
 }
 
-// Admin Dashboard & Viewing Results
+// Admin Dashboard
 function loadAdminDashboard() {
   const pendingCountEl = document.getElementById('pendingCount');
   const adminListEl = document.getElementById('adminList');
@@ -315,7 +317,7 @@ function loadAdminDashboard() {
   `;
 }
 
-// Modal View Function (Inayofanya kitufe cha "Angalia" kionyeshe majina)
+// View Result Modal
 function viewResultDetails(id) {
   let res = submissions.find((x, idx) => String(x.id) === String(id) || String(idx) === String(id));
   if (!res) {
@@ -333,7 +335,6 @@ function viewResultDetails(id) {
   title.textContent = `Matokeo: ${res.class_name || res.class || ''} — ${res.subject || ''}`;
   subTitle.textContent = `Mwalimu: ${res.teacher_name || res.teacher || 'N/A'} | Term: ${res.term || ''} (${res.year || ''}) | Mkondo: ${res.stream || 'A'}`;
 
-  // Kuchukua orodha ya wanafunzi kutoka kwenye JSONB (rows)
   let studentList = [];
   if (Array.isArray(res.rows)) {
     studentList = res.rows;
