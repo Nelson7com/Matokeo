@@ -235,6 +235,24 @@
   </footer>
 </div>
 
+<!-- Modal ya Angalia Matokeo kwa Admin -->
+<div id="viewResultModal" class="modal hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center; z-index:9999;">
+  <div style="background:#fff; padding:24px; border-radius:12px; max-width:800px; width:90%; max-height:85vh; overflow-y:auto; position:relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+    <button onclick="closeResultModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:22px; cursor:pointer; color:#666;">✕</button>
+
+    <h2 id="modalTitle" style="margin-top:0; color:#2c3e50; font-size:20px;">Taarifa za Matokeo</h2>
+    <p id="modalSubTitle" style="color:#666; font-size:14px; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;"></p>
+
+    <div id="modalStudentTableContainer" class="table-wrap">
+      <!-- Orodha ya wanafunzi itaingia hapa kupitia JavaScript -->
+    </div>
+
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="closeResultModal()" class="secondary" style="padding:8px 20px;">Funga</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="script.js"></script>
 </body>
